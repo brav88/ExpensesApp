@@ -4,8 +4,14 @@
  */
 package expenses.manage.module;
 
+import expenses.database.module.databaseHelper;
+import expenses.models.module.User;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -25,14 +31,20 @@ public class expensesServlet extends HttpServlet {
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
+     * @throws java.sql.SQLException
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
         response.setContentType("text/html;charset=UTF-8");
 
         String txtemail = request.getParameter("txtemail");
 
         try ( PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
+
+            databaseHelper dt = new databaseHelper();
+            User user = dt.getUser(txtemail);
+
+            ResultSet resultset = dt.getExpenses(user.id);
+
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
@@ -41,39 +53,19 @@ public class expensesServlet extends HttpServlet {
             out.println("</head>");
             out.println("<body>");
             out.println("<div class='container mt-5'>");
-            out.println("    <div class='row mb-3'>");  
-            out.println("        <div class='col'>");
-            out.println("            <div class='card'>");
-            out.println("                <div class='card-body'>");
-            out.println("                    <h5 class='card-title'>Fecha: <span id='dat'>24 de septiembre de 2024</span></h5>");
-            out.println("                    <p class='card-text'>Descripción del gasto: <span id='description'>Compra de material de oficina</span></p>");
-            out.println("                    <p class='card-text'>Monto: <span id='amount'>$150.00</span></p>");
-            out.println("                </div>");
-            out.println("            </div>");
-            out.println("        </div>");
-            out.println("    </div>");
-            out.println("    <div class='row mb-3'>"); 
-            out.println("        <div class='col'>");
-            out.println("            <div class='card'>");
-            out.println("                <div class='card-body'>");
-            out.println("                    <h5 class='card-title'>Fecha: <span id='dat'>24 de septiembre de 2024</span></h5>");
-            out.println("                    <p class='card-text'>Descripción del gasto: <span id='description'>Compra de material de oficina</span></p>");
-            out.println("                    <p class='card-text'>Monto: <span id='amount'>$150.00</span></p>");
-            out.println("                </div>");
-            out.println("            </div>");
-            out.println("        </div>");
-            out.println("    </div>");
-            out.println("    <div class='row mb-3'>"); 
-            out.println("        <div class='col'>");
-            out.println("            <div class='card'>");
-            out.println("                <div class='card-body'>");
-            out.println("                    <h5 class='card-title'>Fecha: <span id='dat'>24 de septiembre de 2024</span></h5>");
-            out.println("                    <p class='card-text'>Descripción del gasto: <span id='description'>Compra de material de oficina</span></p>");
-            out.println("                    <p class='card-text'>Monto: <span id='amount'>$150.00</span></p>");
-            out.println("                </div>");
-            out.println("            </div>");
-            out.println("        </div>");
-            out.println("    </div>");
+            while (resultset.next()) {
+                out.println("    <div class='row mb-3'>");
+                out.println("        <div class='col'>");
+                out.println("            <div class='card'>");
+                out.println("                <div class='card-body'>");
+                out.println("                    <h5 class='card-title'><span id='dat'>" + resultset.getString("description") + "</span></h5>");
+                out.println("                    <p class='card-text'>Amount: <span id='description'>$" + resultset.getInt("amount") + ".00</span></p>");
+                out.println("                    <p class='card-text'>Date: <span id='amount'>" + resultset.getDate("creationDate") + "</span></p>");
+                out.println("                </div>");
+                out.println("            </div>");
+                out.println("        </div>");
+                out.println("    </div>");
+            }
             out.println("</div>");
             out.println("</body>");
             out.println("</html>");
@@ -92,7 +84,11 @@ public class expensesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(expensesServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
@@ -106,7 +102,11 @@ public class expensesServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try {
+            processRequest(request, response);
+        } catch (SQLException ex) {
+            Logger.getLogger(expensesServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
 
     /**
