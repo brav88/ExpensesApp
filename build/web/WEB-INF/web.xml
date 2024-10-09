@@ -8,6 +8,10 @@
         <servlet-name>expensesServlet</servlet-name>
         <servlet-class>expenses.manage.module.expensesServlet</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>saveExpense</servlet-name>
+        <servlet-class>expenses.manage.module.saveExpense</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>loginServlet</servlet-name>
         <url-pattern>/loginServlet</url-pattern>
@@ -15,6 +19,10 @@
     <servlet-mapping>
         <servlet-name>expensesServlet</servlet-name>
         <url-pattern>/expensesServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>saveExpense</servlet-name>
+        <url-pattern>/saveExpense</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -2,9 +2,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package expenses.access.module;
+package expenses.manage.module;
 
 import expenses.database.module.databaseHelper;
+import expenses.models.module.Expense;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
@@ -15,12 +16,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author Samuel
  */
-public class loginServlet extends HttpServlet {
+public class saveExpense extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -30,17 +32,22 @@ public class loginServlet extends HttpServlet {
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
-     * @throws java.sql.SQLException
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
         response.setContentType("text/html;charset=UTF-8");
 
-        String txtemail = request.getParameter("txtemail");
-        String txtpwd = request.getParameter("txtpwd");
+        try ( PrintWriter out = response.getWriter()) {
+            HttpSession session = request.getSession();
+            int userId = (int) session.getAttribute("userId");
 
-        try ( PrintWriter out = response.getWriter()) {            
+            Expense expense = new Expense(userId,
+                    request.getParameter("txtDescription"),
+                    Float.parseFloat(request.getParameter("txtAmount")));
+
             databaseHelper dt = new databaseHelper();
-            if (dt.validateLogin(txtemail, txtpwd)) {
+
+            if (dt.saveExpense(expense)) {
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/expensesServlet");
                 dispatcher.forward(request, response);
             } else {
@@ -56,19 +63,21 @@ public class loginServlet extends HttpServlet {
                 out.println("<div class='container d-flex justify-content-center align-items-center vh-100'>");
                 out.println("    <div class='card text-center' style='width: 18rem;'>");
                 out.println("        <div class='card-body'>");
-                out.println("            <h5 class='card-title text-danger'>Invalid credentials</h5>");
-                out.println("            <p class='card-text'>Please check your username and password and try again.</p>");
-                out.println("            <a href='index.html' class='btn btn-primary'>Back to Login</a>");
+                out.println("            <h5 class='card-title text-danger'>Error saving your expense</h5>");
+                out.println("            <p class='card-text'>Please try again later</p>");
+                out.println("            <a href='expensesServlet' class='btn btn-primary'>Back to Expenses</a>");
                 out.println("        </div>");
                 out.println("    </div>");
                 out.println("</div>");
+                out.println("</body>");
+                out.println("</html>");
             }
-            out.println("</body>");
-            out.println("</html>");
+        } catch (SQLException e) {
+            response.getWriter().println("Error de base de datos: " + e.getMessage());
         }
     }
 
-// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -78,13 +87,8 @@ public class loginServlet extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        processRequest(request, response);
     }
 
     /**
@@ -98,11 +102,7 @@ public class loginServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(loginServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        processRequest(request, response);
     }
 
     /**

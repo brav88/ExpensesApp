@@ -4,6 +4,7 @@
  */
 package expenses.database.module;
 
+import expenses.models.module.Expense;
 import expenses.models.module.User;
 import java.sql.*;
 import java.util.logging.Level;
@@ -38,9 +39,23 @@ public class databaseHelper {
 
     public ResultSet getExpenses(int idUser) throws SQLException {
         Statement statement = conn.createStatement();
-        String sql = "SELECT * FROM expensesdatabase.expenses WHERE idUser = " + idUser + "";        
+        String sql = "SELECT * FROM expensesdatabase.expenses WHERE idUser = " + idUser + "";
         ResultSet resultset = statement.executeQuery(sql);
         return resultset;
+    }
+
+    public boolean saveExpense(Expense expense) {
+        try {
+            Statement statement = conn.createStatement();
+            String sql = "INSERT INTO expenses (idUser, description, amount, creationDate) VALUES (" + expense.userId + ", '"
+                    + expense.description + "', "
+                    + expense.amount + ", CURDATE());";
+            statement.executeUpdate(sql);
+
+            return true;
+        } catch (SQLException ex)  {
+            return false;
+        }
     }
 
     public User getUser(String email) throws SQLException {
