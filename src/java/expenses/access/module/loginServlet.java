@@ -15,6 +15,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -38,9 +39,17 @@ public class loginServlet extends HttpServlet {
         String txtemail = request.getParameter("txtemail");
         String txtpwd = request.getParameter("txtpwd");
 
+        HttpSession session = request.getSession(false);
+        
+        if (session != null) 
+        {
+            session.invalidate();
+        }
+                        
         try ( PrintWriter out = response.getWriter()) {            
             databaseHelper dt = new databaseHelper();
             if (dt.validateLogin(txtemail, txtpwd)) {
+                dt.Close();
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/expensesServlet");
                 dispatcher.forward(request, response);
             } else {

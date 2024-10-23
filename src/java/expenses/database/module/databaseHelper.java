@@ -18,6 +18,14 @@ public class databaseHelper {
 
     Connection conn;
 
+    public void Close() {
+        try {
+            conn.close();
+        } catch (SQLException ex) {
+            Logger.getLogger(databaseHelper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
     public databaseHelper() throws SQLException {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -53,11 +61,35 @@ public class databaseHelper {
             statement.executeUpdate(sql);
 
             return true;
-        } catch (SQLException ex)  {
+        } catch (SQLException ex) {
             return false;
         }
     }
 
+    public boolean updateExpense(int id, String desc, float amount) {
+        try {
+            Statement statement = conn.createStatement();
+            String sql = "UPDATE expenses SET description = '" + desc + "', amount = " + amount + " WHERE id = " + id + ";";
+            statement.executeUpdate(sql);
+
+            return true;
+        } catch (SQLException ex) {
+            return false;
+        }
+    }
+
+     public boolean deleteExpense(int id) {
+        try {
+            Statement statement = conn.createStatement();
+            String sql = "DELETE FROM expenses WHERE id = " + id + ";";
+            statement.executeUpdate(sql);
+
+            return true;
+        } catch (SQLException ex) {
+            return false;
+        }
+    }
+    
     public User getUser(String email) throws SQLException {
         Statement statement = conn.createStatement();
         String sql = "SELECT * FROM expensesdatabase.users WHERE email = '" + email + "'";

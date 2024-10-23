@@ -12,6 +12,18 @@
         <servlet-name>saveExpense</servlet-name>
         <servlet-class>expenses.manage.module.saveExpense</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>loadExpenseServlet</servlet-name>
+        <servlet-class>expenses.manage.module.loadExpenseServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>updateExpenseServlet</servlet-name>
+        <servlet-class>expenses.manage.module.updateExpenseServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>deleteExpenseServlet</servlet-name>
+        <servlet-class>expenses.manage.module.deleteExpenseServlet</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>loginServlet</servlet-name>
         <url-pattern>/loginServlet</url-pattern>
@@ -23,6 +35,18 @@
     <servlet-mapping>
         <servlet-name>saveExpense</servlet-name>
         <url-pattern>/saveExpense</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>loadExpenseServlet</servlet-name>
+        <url-pattern>/loadExpenseServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>updateExpenseServlet</servlet-name>
+        <url-pattern>/updateExpenseServlet</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>deleteExpenseServlet</servlet-name>
+        <url-pattern>/deleteExpenseServlet</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

@@ -14,8 +14,8 @@ public class Expense {
     public float amount;    
     
     public Expense(int _userId, 
-                String _description,
-                float _amount)
+                   String _description,
+                   float _amount)
     {
         this.userId = _userId;
         this.description = _description;

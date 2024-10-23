@@ -4,25 +4,18 @@
  */
 package expenses.manage.module;
 
-import expenses.database.module.databaseHelper;
-import expenses.models.module.User;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 
 /**
  *
  * @author Samuel
  */
-public class expensesServlet extends HttpServlet {
+public class loadExpenseServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -32,37 +25,21 @@ public class expensesServlet extends HttpServlet {
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
-     * @throws java.sql.SQLException
      */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
 
-        String txtemail;
-
-        HttpSession session = request.getSession(false);
-
-        if (session == null) {
-            session = request.getSession();
-            txtemail = request.getParameter("txtemail");
-        } else {
-            txtemail = (String) session.getAttribute("email");
-        }
+        int id = Integer.parseInt(request.getParameter("id"));
+        String desc = request.getParameter("desc");
+        float amount = Float.parseFloat(request.getParameter("amount"));
 
         try ( PrintWriter out = response.getWriter()) {
-
-            databaseHelper dt = new databaseHelper();
-            User user = dt.getUser(txtemail);
-
-            session.setAttribute("userId", user.id);
-            session.setAttribute("email", user.email);
-            ResultSet resultset = dt.getExpenses(user.id);
-
+            /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
             out.println("<title>Servlet expensesServlet</title>");
             out.println("<link href='https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css' rel='stylesheet'>");
-            out.println("<script src='https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js' integrity='sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz' crossorigin='anonymous'></script>");
             out.println("<style>");
             out.println("  html, body { height: 100%; }");  // Asegura que el html y el body ocupen el 100% de la altura
             out.println("  body { display: flex; flex-direction: column; }");  // Usa flexbox en el body
@@ -97,49 +74,28 @@ public class expensesServlet extends HttpServlet {
             out.println("  </div>");
             out.println("</nav>");
 
-            out.println("<main class='container mt-5'>");
-
-            out.println(" <form action='saveExpense'>");
-            out.println("   <div class='row mb-3'>");
-            out.println("       <div class='col'>");
-            out.println("           <div class='card-body'>");
-            out.println("               <label for='txtDescription' class='form-label'>Description</label>");
-            out.println("               <input type='text' class='form-control' id='txtDescription' name='txtDescription'>");
-            out.println("           </div>");
-            out.println("       </div>");
-            out.println("       <div class='col'>");
-            out.println("           <div class='card-body'>");
-            out.println("               <label for='txtAmount' class='form-label'>Amount</label>");
-            out.println("               <input type='number' class='form-control' id='txtAmount' name='txtAmount'>");
-            out.println("               <button type='submit' class='btn btn-primary'>Save</button>");
-            out.println("           </div>");
-            out.println("       </div>");
+            out.println("<main class='container mt-5' style='width: 18rem;'>");
+            out.println("<div class='card'>");
+            out.println(" <div class='card-body'>");
+            out.println("  <form action='updateExpenseServlet'>");
+            out.println("   <div class='mb-3'>");
+            out.println("       <label for='txtId' class='form-label'>Id</label>");
+            out.println("       <input type='text' class='form-control' id='txtId' name='txtId' value='" + id + "' readonly>");
+            out.println("   </div>");
+            out.println("   <div class='mb-3'>");
+            out.println("       <label for='txtDescription' class='form-label'>Description</label>");
+            out.println("       <input type='text' class='form-control' id='txtDescription' name='txtDescription' value='" + desc + "'>");
+            out.println("   </div>");
+            out.println("   <div class='mb-3'>");
+            out.println("       <label for='txtAmount' class='form-label'>Amount</label>");
+            out.println("       <input type='number' class='form-control' id='txtAmount' name='txtAmount' value=" + amount + ">");
+            out.println("   </div>");
+            out.println("   <div class='mb-3'>");
+            out.println("       <button type='submit' class='btn btn-primary'>Update</button>");
             out.println("   </div>");
             out.println(" </form>");
-
-            // Main content
-            while (resultset.next()) {
-                out.println("    <div class='row mb-3'>");
-                out.println("        <div class='col'>");
-                out.println("            <div class='card'>");
-                out.println("                <div class='card-body'>");
-                out.println("                    <h5 class='card-title'><span id='dat'>" + resultset.getString("description") + "</span></h5>");
-                out.println("                    <p class='card-text'>Amount: <span id='description'>$" + resultset.getInt("amount") + ".00</span></p>");
-                out.println("                    <p class='card-text'>Date: <span id='amount'>" + resultset.getDate("creationDate") + "</span></p>");
-                out.println("                    <button onclick=\"window.location.href='loadExpenseServlet?id=" + resultset.getInt("id") + "&desc=" + resultset.getString("description") + "&amount=" + resultset.getInt("amount") + "'\" class='btn btn-primary'>Edit</button>");                
-                out.println("                    <button class=\"btn btn-danger\" type=\"button\" data-bs-toggle=\"collapse\" data-bs-target=\"#collapseExample" + resultset.getInt("id") + "\" aria-expanded=\"false\" aria-controls=\"collapseExample\">");                
-                out.println("                    Delete");                
-                out.println("                  </button>");                
-                out.println("                    <div class='collapse mt-3' id='collapseExample" + resultset.getInt("id") + "'>");                
-                out.println("                   <div class='card card-body'>");    
-                out.println("                        Do you want to delete this record? <button onclick=\"window.location.href='deleteExpenseServlet?id=" + resultset.getInt("id") + "'\" class='btn btn-danger'>Delete</button>"); 
-                out.println("                   </div>");   
-                out.println("                  </div>");   
-                out.println("                </div>");
-                out.println("            </div>");
-                out.println("        </div>");
-                out.println("    </div>");
-            }
+            out.println(" </div>");
+            out.println("</div>");
             out.println("</main>");
 
             // Footer
@@ -165,10 +121,8 @@ public class expensesServlet extends HttpServlet {
             out.println("    © 2024 GastosApp | All rights reserved.");
             out.println("  </div>");
             out.println("</footer>");
-
             out.println("</body>");
             out.println("</html>");
-            dt.Close();
         }
     }
 
@@ -184,11 +138,7 @@ public class expensesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(expensesServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        processRequest(request, response);
     }
 
     /**
@@ -202,11 +152,7 @@ public class expensesServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        try {
-            processRequest(request, response);
-        } catch (SQLException ex) {
-            Logger.getLogger(expensesServlet.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        processRequest(request, response);
     }
 
     /**

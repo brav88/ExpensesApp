@@ -9,8 +9,6 @@ import expenses.models.module.Expense;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -22,7 +20,7 @@ import javax.servlet.http.HttpSession;
  *
  * @author Samuel
  */
-public class saveExpense extends HttpServlet {
+public class updateExpenseServlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -34,20 +32,16 @@ public class saveExpense extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
         response.setContentType("text/html;charset=UTF-8");
 
-        try ( PrintWriter out = response.getWriter()) {
-            HttpSession session = request.getSession();
-            int userId = (int) session.getAttribute("userId");
-
-            Expense expense = new Expense(userId,
-                    request.getParameter("txtDescription"),
-                    Float.parseFloat(request.getParameter("txtAmount")));
-
+        try ( PrintWriter out = response.getWriter()) {           
+            int id = Integer.parseInt(request.getParameter("txtId"));
+            String desc = request.getParameter("txtDescription");
+            float amount = Float.parseFloat(request.getParameter("txtAmount"));
+                       
             databaseHelper dt = new databaseHelper();
 
-            if (dt.saveExpense(expense)) {
+            if (dt.updateExpense(id, desc, amount)) {
                 dt.Close();
                 RequestDispatcher dispatcher = request.getRequestDispatcher("/expensesServlet");
                 dispatcher.forward(request, response);
@@ -64,7 +58,7 @@ public class saveExpense extends HttpServlet {
                 out.println("<div class='container d-flex justify-content-center align-items-center vh-100'>");
                 out.println("    <div class='card text-center' style='width: 18rem;'>");
                 out.println("        <div class='card-body'>");
-                out.println("            <h5 class='card-title text-danger'>Error saving your expense</h5>");
+                out.println("            <h5 class='card-title text-danger'>Error updating your expense</h5>");
                 out.println("            <p class='card-text'>Please try again later</p>");
                 out.println("            <a href='expensesServlet' class='btn btn-primary'>Back to Expenses</a>");
                 out.println("        </div>");
@@ -88,7 +82,8 @@ public class saveExpense extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         processRequest(request, response);
     }
 
